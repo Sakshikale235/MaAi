@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import { ArrowLeft, Brain, User, Stethoscope, RefreshCw, Shield } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
+import { useLanguage } from '@/context/LanguageContext';
 
 const AUDIT_ENTRIES = [
   {
@@ -84,6 +85,7 @@ const TYPE_CONFIG = {
 };
 
 export default function AuditScreen() {
+  const { t } = useLanguage();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -97,20 +99,20 @@ export default function AuditScreen() {
           <ArrowLeft size={22} color={Colors.text.primary} />
         </TouchableOpacity>
         <View>
-          <Text style={styles.headerTitle}>Audit Log</Text>
-          <Text style={styles.headerSub}>Radha Kumari · All events</Text>
+          <Text style={styles.headerTitle}>{t('audit_log')}</Text>
+          <Text style={styles.headerSub}>Radha Kumari · {t('all_events')}</Text>
         </View>
         <View style={styles.secureTag}>
           <Shield size={12} color={Colors.primary} />
-          <Text style={styles.secureText}>Immutable</Text>
+          <Text style={styles.secureText}>{t('immutable')}</Text>
         </View>
       </View>
 
       <View style={styles.legend}>
         {[
-          { label: 'AI Decision', color: Colors.primary },
-          { label: 'ANM Action', color: Colors.risk.low },
-          { label: 'MO Review', color: Colors.risk.medium },
+          { label: t('ai_decision'), color: Colors.primary },
+          { label: t('anm_action'), color: Colors.risk.low },
+          { label: t('mo_review'), color: Colors.risk.medium },
         ].map((item) => (
           <View key={item.label} style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: item.color }]} />

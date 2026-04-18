@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, Image, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow } from '@/constants/theme';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function HeroSection() {
+  const { t } = useLanguage();
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -15,22 +17,22 @@ export default function HeroSection() {
       >
         <View style={styles.content}>
           <View style={styles.textBlock}>
-            <Text style={styles.tagline}>Supporting safe motherhood</Text>
-            <Text style={styles.subtitle}>AI-assisted care for every mother & newborn</Text>
+            <Text style={styles.tagline}>{t('supporting_safe_motherhood')}</Text>
+            <Text style={styles.subtitle}>{t('ai_assisted_care')}</Text>
             <View style={styles.statsRow}>
               <View style={styles.stat}>
                 <Text style={styles.statNum}>1.2K+</Text>
-                <Text style={styles.statLabel}>Patients</Text>
+                <Text style={styles.statLabel}>{t('patients_short')}</Text>
               </View>
               <View style={styles.divider} />
               <View style={styles.stat}>
                 <Text style={styles.statNum}>98%</Text>
-                <Text style={styles.statLabel}>Accuracy</Text>
+                <Text style={styles.statLabel}>{t('accuracy')}</Text>
               </View>
               <View style={styles.divider} />
               <View style={styles.stat}>
                 <Text style={styles.statNum}>24/7</Text>
-                <Text style={styles.statLabel}>Offline</Text>
+                <Text style={styles.statLabel}>{t('offline')}</Text>
               </View>
             </View>
           </View>

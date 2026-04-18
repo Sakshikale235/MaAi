@@ -4,8 +4,10 @@ import { View, StyleSheet, Platform } from 'react-native';
 import { Hop as Home, Users, TriangleAlert as AlertTriangle, ClipboardList, Settings } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { FontSize, FontWeight } from '@/constants/theme';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function TabLayout() {
+  const { t } = useLanguage();
   return (
     <Tabs
       screenOptions={{
@@ -20,7 +22,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: t('home'),
           tabBarIcon: ({ size, color, focused }) => (
             <TabIcon Icon={Home} size={size} color={color} focused={focused} />
           ),
@@ -29,7 +31,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="patients"
         options={{
-          title: 'Patients',
+          title: t('patients'),
           tabBarIcon: ({ size, color, focused }) => (
             <TabIcon Icon={Users} size={size} color={color} focused={focused} />
           ),
@@ -38,7 +40,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="alerts"
         options={{
-          title: 'Alerts',
+          title: t('alerts'),
           tabBarIcon: ({ size, color, focused }) => (
             <TabIcon Icon={AlertTriangle} size={size} color={color} focused={focused} badge={7} />
           ),
@@ -47,7 +49,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="mo"
         options={{
-          title: 'MO Review',
+          title: t('mo_review'),
           tabBarIcon: ({ size, color, focused }) => (
             <TabIcon Icon={ClipboardList} size={size} color={color} focused={focused} />
           ),
@@ -56,7 +58,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          title: t('settings'),
           tabBarIcon: ({ size, color, focused }) => (
             <TabIcon Icon={Settings} size={size} color={color} focused={focused} />
           ),

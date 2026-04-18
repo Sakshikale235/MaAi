@@ -17,13 +17,14 @@ import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
 import ChatBubble from '@/components/chat/ChatBubble';
 import { ChatMessage } from '@/types';
+import { useLanguage } from '@/context/LanguageContext';
 
 const SUGGESTED = [
-  'What does high BP mean in pregnancy?',
-  'What should I do for pre-eclampsia?',
-  'When to refer immediately?',
-  'What is MUAC and its significance?',
-  'How to assess fetal heart sounds?',
+  'chat_q1',
+  'chat_q2',
+  'chat_q3',
+  'chat_q4',
+  'chat_q5',
 ];
 
 const AI_RESPONSES: Record<string, string> = {
@@ -53,10 +54,11 @@ function getResponse(text: string): string {
 }
 
 export default function ChatbotScreen() {
+  const { t } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
-      content: 'Hello! I\'m MaaAI, your clinical decision support assistant. How can I help you today? You can ask me about maternal health, risk assessment, or clinical protocols.',
+      content: t('chat_welcome'),
       sender: 'ai',
       timestamp: 'Now',
     },
@@ -97,7 +99,7 @@ export default function ChatbotScreen() {
 
     const aiMsg: ChatMessage = {
       id: String(msgId++),
-      content: getResponse(text),
+      content: getResponse(text) === AI_RESPONSES.default ? t('chat_resp_default') : getResponse(text),
       sender: 'ai',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
@@ -116,10 +118,10 @@ export default function ChatbotScreen() {
             <Text style={styles.aiAvatarText}>AI</Text>
           </View>
           <View>
-            <Text style={styles.headerTitle}>MaaAI Assistant</Text>
+            <Text style={styles.headerTitle}>{t('maa_ai')} Assistant</Text>
             <View style={styles.onlineRow}>
               <View style={styles.onlineDot} />
-              <Text style={styles.onlineText}>Always available · Offline-ready</Text>
+              <Text style={styles.onlineText}>{t('chat_online_status')}</Text>
             </View>
           </View>
         </View>
@@ -146,7 +148,7 @@ export default function ChatbotScreen() {
       />
 
       <View style={styles.suggestedScroll}>
-        <Text style={styles.suggestedLabel}>Suggested questions</Text>
+        <Text style={styles.suggestedLabel}>{t('chat_suggested')}</Text>
         <FlatList
           horizontal
           data={SUGGESTED}
@@ -156,9 +158,9 @@ export default function ChatbotScreen() {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.suggestedChip}
-              onPress={() => sendMessage(item)}
+              onPress={() => sendMessage(t(item as any))}
             >
-              <Text style={styles.suggestedText}>{item}</Text>
+              <Text style={styles.suggestedText}>{t(item as any)}</Text>
             </TouchableOpacity>
           )}
         />
@@ -173,7 +175,7 @@ export default function ChatbotScreen() {
             style={styles.input}
             value={input}
             onChangeText={setInput}
-            placeholder="Ask a clinical question…"
+            placeholder={t('chat_ask')}
             placeholderTextColor={Colors.text.muted}
             multiline
             maxLength={500}

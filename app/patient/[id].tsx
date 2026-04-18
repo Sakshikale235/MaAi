@@ -22,12 +22,13 @@ import {
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
 import Badge from '@/components/ui/Badge';
+import { useLanguage } from '@/context/LanguageContext';
 
 const TAB_DATA = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'assessments', label: 'Assessments' },
-  { id: 'epds', label: 'EPDS' },
-  { id: 'audit', label: 'Audit Log' },
+  { id: 'overview', label: 'overview' },
+  { id: 'assessments', label: 'assessments_tab' },
+  { id: 'epds', label: 'epds' },
+  { id: 'audit', label: 'audit_log' },
 ];
 
 const PATIENT = {
@@ -50,6 +51,7 @@ const PATIENT = {
 
 export default function PatientDetailScreen() {
   const { id } = useLocalSearchParams();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('overview');
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -81,7 +83,7 @@ export default function PatientDetailScreen() {
             onPress={() => setActiveTab(tab.id)}
           >
             <Text style={[styles.tabText, activeTab === tab.id && styles.tabTextActive]}>
-              {tab.label}
+              {t(tab.label as any)}
             </Text>
           </TouchableOpacity>
         ))}
@@ -116,6 +118,7 @@ export default function PatientDetailScreen() {
 }
 
 function OverviewTab() {
+  const { t } = useLanguage();
   return (
     <View style={styles.tabContent}>
       <View style={styles.profileCard}>
@@ -147,15 +150,15 @@ function OverviewTab() {
 
       <View style={styles.infoGrid}>
         {[
-          { label: 'Blood Group', value: PATIENT.bloodGroup },
-          { label: 'Height', value: PATIENT.height },
-          { label: 'Weight', value: PATIENT.weight },
-          { label: 'Weeks', value: `${PATIENT.weeksPregnant}w` },
-          { label: 'LMP', value: PATIENT.lmp },
-          { label: 'EDD', value: PATIENT.edd },
+          { label: 'blood_group', value: PATIENT.bloodGroup },
+          { label: 'height', value: PATIENT.height },
+          { label: 'weight', value: PATIENT.weight },
+          { label: 'weeks', value: `${PATIENT.weeksPregnant}w` },
+          { label: 'lmp', value: PATIENT.lmp },
+          { label: 'edd', value: PATIENT.edd },
         ].map((item) => (
           <View key={item.label} style={styles.infoCell}>
-            <Text style={styles.infoCellLabel}>{item.label}</Text>
+            <Text style={styles.infoCellLabel}>{t(item.label as any)}</Text>
             <Text style={styles.infoCellValue}>{item.value}</Text>
           </View>
         ))}
@@ -164,9 +167,9 @@ function OverviewTab() {
       <View style={styles.riskSummaryCard}>
         <View style={styles.riskSummaryHeader}>
           <Brain size={18} color={Colors.risk.high} />
-          <Text style={styles.riskSummaryTitle}>Latest AI Risk Assessment</Text>
+          <Text style={styles.riskSummaryTitle}>{t('latest_ai_risk')}</Text>
         </View>
-        <Text style={styles.riskSummaryLevel}>HIGH RISK</Text>
+        <Text style={styles.riskSummaryLevel}>{t('high_risk').toUpperCase()}</Text>
         <Text style={styles.riskSummaryReason}>
           BP: 160/110 · Severe headache · Visual disturbances · Oedema present
         </Text>
@@ -174,7 +177,7 @@ function OverviewTab() {
           style={styles.viewResultBtn}
           onPress={() => router.push('/ai/result')}
         >
-          <Text style={styles.viewResultText}>View Full AI Report →</Text>
+          <Text style={styles.viewResultText}>{t('view_full_report')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -206,18 +209,19 @@ function AssessmentsTab() {
 }
 
 function EPDSTab() {
+  const { t } = useLanguage();
   return (
     <View style={styles.tabContent}>
       <View style={styles.epdsCard}>
-        <Text style={styles.epdsTitle}>Edinburgh Postnatal Depression Scale</Text>
+        <Text style={styles.epdsTitle}>{t('edinburgh_scale')}</Text>
         <View style={styles.epdsScore}>
           <Text style={styles.epdsScoreNum}>14</Text>
           <Text style={styles.epdsScoreLabel}>/ 30</Text>
         </View>
-        <Badge label="Moderate Risk" variant="warning" />
-        <Text style={styles.epdsDate}>Screened: 2 weeks ago</Text>
+        <Badge label={t('moderate_risk')} variant="warning" />
+        <Text style={styles.epdsDate}>{t('screened_ago')}: 2 weeks ago</Text>
         <TouchableOpacity style={styles.epdsBtn} onPress={() => router.push('/epds')}>
-          <Text style={styles.epdsButtonText}>Start New Screening</Text>
+          <Text style={styles.epdsButtonText}>{t('start_new_screening')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -225,6 +229,7 @@ function EPDSTab() {
 }
 
 function AuditTab() {
+  const { t } = useLanguage();
   return (
     <View style={styles.tabContent}>
       <TouchableOpacity
@@ -232,7 +237,7 @@ function AuditTab() {
         onPress={() => router.push('/audit')}
       >
         <Clock size={16} color={Colors.primary} />
-        <Text style={styles.auditViewText}>View Full Audit Timeline</Text>
+        <Text style={styles.auditViewText}>{t('view_full_audit')}</Text>
       </TouchableOpacity>
       {[
         { time: 'Today 10:30', action: 'AI assessed HIGH risk', actor: 'MaaAI System', type: 'AI_DECISION' },

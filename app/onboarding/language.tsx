@@ -6,6 +6,7 @@ import { CircleCheck as CheckCircle } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
 import Button from '@/components/ui/Button';
+import { useLanguage } from '@/context/LanguageContext';
 
 const LANGUAGES = [
   { code: 'en', name: 'English', native: 'English', flag: '🇬🇧', desc: 'Continue in English' },
@@ -14,7 +15,8 @@ const LANGUAGES = [
 ];
 
 export default function LanguageScreen() {
-  const [selected, setSelected] = useState('en');
+  const { language, setLanguage, t } = useLanguage();
+  const [selected, setSelected] = useState<string>(language || 'en');
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -31,9 +33,9 @@ export default function LanguageScreen() {
         colors={['#0E7C86', '#4BBAC8']}
         style={styles.header}
       >
-        <Text style={styles.headerLogo}>⚕ MaaAI</Text>
-        <Text style={styles.headerTitle}>Choose your language</Text>
-        <Text style={styles.headerSub}>भाषा चुनें · भाषा निवडा</Text>
+        <Text style={styles.headerLogo}>{t('maa_ai')}</Text>
+        <Text style={styles.headerTitle}>{t('choose_language')}</Text>
+        <Text style={styles.headerSub}>{t('choose_language_sub')}</Text>
       </LinearGradient>
 
       <Animated.View
@@ -52,13 +54,16 @@ export default function LanguageScreen() {
 
           <View style={styles.info}>
             <Text style={styles.infoText}>
-              Language can be changed anytime from Settings
+              {t('language_info')}
             </Text>
           </View>
 
           <Button
-            title="Continue"
-            onPress={() => router.replace('/auth/login')}
+            title={t('continue')}
+            onPress={async () => {
+              await setLanguage(selected as any);
+              router.replace('/auth/login');
+            }}
             fullWidth
             size="lg"
             style={styles.btn}

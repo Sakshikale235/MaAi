@@ -13,61 +13,63 @@ import { ArrowLeft, Play, Mic, MicOff, Check } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
 import ProgressBar from '@/components/ui/ProgressBar';
+import { useLanguage } from '@/context/LanguageContext';
 
 const QUESTIONS = [
   {
     id: 1,
-    text: 'I have been able to laugh and see the funny side of things.',
+    text: 'epds_q1',
     options: [
-      { label: 'As much as I always could', score: 0 },
-      { label: 'Not quite so much now', score: 1 },
-      { label: 'Definitely not so much now', score: 2 },
-      { label: 'Not at all', score: 3 },
+      { label: 'epds_q1_o0', score: 0 },
+      { label: 'epds_q1_o1', score: 1 },
+      { label: 'epds_q1_o2', score: 2 },
+      { label: 'epds_q1_o3', score: 3 },
     ],
   },
   {
     id: 2,
-    text: 'I have looked forward with enjoyment to things.',
+    text: 'epds_q2',
     options: [
-      { label: 'As much as I ever did', score: 0 },
-      { label: 'Rather less than I used to', score: 1 },
-      { label: 'Definitely less than I used to', score: 2 },
-      { label: 'Hardly at all', score: 3 },
+      { label: 'epds_q2_o0', score: 0 },
+      { label: 'epds_q2_o1', score: 1 },
+      { label: 'epds_q2_o2', score: 2 },
+      { label: 'epds_q2_o3', score: 3 },
     ],
   },
   {
     id: 3,
-    text: 'I have felt scared or panicky for no very good reason.',
+    text: 'epds_q3',
     options: [
-      { label: 'No, not at all', score: 0 },
-      { label: 'No, not much', score: 1 },
-      { label: 'Yes, sometimes', score: 2 },
-      { label: 'Yes, quite a lot', score: 3 },
+      { label: 'epds_q3_o0', score: 0 },
+      { label: 'epds_q3_o1', score: 1 },
+      { label: 'epds_q3_o2', score: 2 },
+      { label: 'epds_q3_o3', score: 3 },
     ],
   },
   {
     id: 4,
-    text: 'Things have been getting on top of me.',
+    text: 'epds_q4',
     options: [
-      { label: 'No, I have been coping as well as ever', score: 0 },
-      { label: 'No, most of the time I have coped quite well', score: 1 },
-      { label: 'Yes, sometimes I haven\'t been coping as well as usual', score: 2 },
-      { label: 'Yes, most of the time I haven\'t been able to cope at all', score: 3 },
+      { label: 'epds_q4_o0', score: 0 },
+      { label: 'epds_q4_o1', score: 1 },
+      { label: 'epds_q4_o2', score: 2 },
+      { label: 'epds_q4_o3', score: 3 },
     ],
   },
   {
     id: 5,
-    text: 'I have been so unhappy that I have had difficulty sleeping.',
+    text: 'epds_q5',
     options: [
-      { label: 'No, not at all', score: 0 },
-      { label: 'Not very often', score: 1 },
-      { label: 'Yes, sometimes', score: 2 },
-      { label: 'Yes, most of the time', score: 3 },
+      { label: 'epds_q5_o0', score: 0 },
+      { label: 'epds_q5_o1', score: 1 },
+      { label: 'epds_q5_o2', score: 2 },
+      { label: 'epds_q5_o3', score: 3 },
     ],
   },
 ];
 
 export default function EPDSScreen() {
+  const { t } = useLanguage();
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -128,29 +130,29 @@ export default function EPDSScreen() {
       <SafeAreaView style={styles.safe}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}><ArrowLeft size={22} color={Colors.text.primary} /></TouchableOpacity>
-          <Text style={styles.headerTitle}>EPDS Result</Text>
+          <Text style={styles.headerTitle}>{t('epds_result_title')}</Text>
         </View>
         <ScrollView contentContainerStyle={styles.resultScroll}>
           <View style={[styles.resultCard, { borderTopColor: riskColor }]}>
-            <Text style={styles.resultTitle}>Edinburgh Postnatal Depression Scale</Text>
+            <Text style={styles.resultTitle}>{t('edinburgh_scale')}</Text>
             <View style={[styles.scoreCircle, { backgroundColor: riskBg, borderColor: riskColor }]}>
               <Text style={[styles.scoreNum, { color: riskColor }]}>{totalScore}</Text>
               <Text style={[styles.scoreDenom, { color: riskColor }]}>/ {QUESTIONS.length * 3}</Text>
             </View>
             <View style={[styles.riskResultBadge, { backgroundColor: riskBg }]}>
-              <Text style={[styles.riskResultText, { color: riskColor }]}>{risk} RISK OF PPD</Text>
+              <Text style={[styles.riskResultText, { color: riskColor }]}>{t(risk.toLowerCase() as any)} {t('risk_of_ppd')}</Text>
             </View>
             <Text style={styles.recommendation}>
               {risk === 'HIGH'
-                ? 'Immediate mental health referral required. Patient shows significant depressive symptoms. Consult MO and arrange counseling.'
+                ? t('recommend_high')
                 : risk === 'MEDIUM'
-                  ? 'Monitor closely and schedule follow-up in 1 week. Provide emotional support and counseling resources.'
-                  : 'Patient shows low risk of postnatal depression. Continue routine monitoring and support.'}
+                  ? t('recommend_medium')
+                  : t('recommend_low')}
             </Text>
           </View>
 
           <TouchableOpacity style={styles.retakeBtn} onPress={() => { setCompleted(false); setCurrentQ(0); setAnswers([]); setSelectedIdx(null); }}>
-            <Text style={styles.retakeBtnText}>Retake Screening</Text>
+            <Text style={styles.retakeBtnText}>{t('retake_screening')}</Text>
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
@@ -165,11 +167,11 @@ export default function EPDSScreen() {
         <TouchableOpacity onPress={() => router.back()}>
           <ArrowLeft size={22} color={Colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>EPDS Screening</Text>
+        <Text style={styles.headerTitle}>{t('epds_screening_title')}</Text>
       </View>
 
       <View style={styles.progressSection}>
-        <ProgressBar current={currentQ + 1} total={QUESTIONS.length} label="Edinburgh Postnatal Depression Scale" />
+        <ProgressBar current={currentQ + 1} total={QUESTIONS.length} label={t('edinburgh_scale')} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -178,10 +180,10 @@ export default function EPDSScreen() {
             <View style={styles.qNum}>
               <Text style={styles.qNumText}>{currentQ + 1}</Text>
             </View>
-            <Text style={styles.qCount}>of {QUESTIONS.length}</Text>
+            <Text style={styles.qCount}>{t('of')} {QUESTIONS.length}</Text>
           </View>
 
-          <Text style={styles.questionText}>{question.text}</Text>
+          <Text style={styles.questionText}>{t(question.text as any)}</Text>
 
           <View style={styles.audioRow}>
             <TouchableOpacity
@@ -190,7 +192,7 @@ export default function EPDSScreen() {
             >
               <Play size={18} color={isPlaying ? '#fff' : Colors.primary} fill={isPlaying ? '#fff' : 'none'} />
               <Text style={[styles.playBtnText, isPlaying && { color: '#fff' }]}>
-                {isPlaying ? 'Playing…' : 'Play Question'}
+                {isPlaying ? t('playing') : t('play_question')}
               </Text>
             </TouchableOpacity>
 
@@ -220,7 +222,7 @@ export default function EPDSScreen() {
                 {selectedIdx === idx && <View style={styles.optionRadioFill} />}
               </View>
               <Text style={[styles.optionText, selectedIdx === idx && styles.optionTextSelected]}>
-                {opt.label}
+                {t(opt.label as any)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -232,7 +234,7 @@ export default function EPDSScreen() {
           disabled={selectedIdx === null}
         >
           <Text style={styles.nextBtnText}>
-            {currentQ === QUESTIONS.length - 1 ? 'Complete Screening' : 'Next Question'}
+            {currentQ === QUESTIONS.length - 1 ? t('complete_screening') : t('next_question')}
           </Text>
           <Check size={18} color="#fff" />
         </TouchableOpacity>

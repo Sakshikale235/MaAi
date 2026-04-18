@@ -10,17 +10,30 @@ import {
   TextInput,
   Modal,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, FileText, MessageCircle, ThumbsDown, Share2, CircleCheck as CheckCircle } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
 import RiskGauge from '@/components/ui/RiskGauge';
 import Button from '@/components/ui/Button';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function AIResultScreen() {
+  const { t } = useLanguage();
+  const { risk, reason, rec, confidence, patient_name, age, gestation_weeks } = useLocalSearchParams();
   const [disagreeVisible, setDisagreeVisible] = useState(false);
   const [disagreeReason, setDisagreeReason] = useState('');
   const [submitted, setSubmitted] = useState(false);
+
+  const displayRisk = typeof risk === 'string' ? risk.toUpperCase() : 'HIGH';
+  const displayReason = typeof reason === 'string' ? reason : null;
+  const displayRec = typeof rec === 'string' ? rec : t('rec_text');
+  
+  let nameLabel = typeof patient_name === 'string' && patient_name ? patient_name : 'Unknown Patient';
+  if (typeof age === 'string' && age) nameLabel += ` · ${age} yrs`;
+  if (typeof gestation_weeks === 'string' && gestation_weeks) nameLabel += ` · ${gestation_weeks}w`;
+  
+  const numericConfidence = typeof confidence === 'string' && !isNaN(parseFloat(confidence)) ? parseFloat(confidence) : 92;
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -45,7 +58,7 @@ export default function AIResultScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.back}>
           <ArrowLeft size={22} color={Colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>AI Risk Assessment</Text>
+        <Text style={styles.headerTitle}>{t('ai_risk_assessment_title')}</Text>
         <View style={styles.badge}>
           <Text style={styles.badgeText}>v2.1</Text>
         </View>
@@ -55,49 +68,56 @@ export default function AIResultScreen() {
         <Animated.View
           style={[styles.gaugeSection, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
         >
-          <Text style={styles.patientLabel}>Radha Kumari · 24 yrs · 32w</Text>
-          <RiskGauge risk="HIGH" confidence={0.92} size={200} />
+          <Text style={styles.patientLabel}>{nameLabel}</Text>
+          <RiskGauge risk={displayRisk as any} confidence={numericConfidence / 100} size={200} />
         </Animated.View>
 
         <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
           <View style={styles.explanationCard}>
-            <Text style={styles.explainTitle}>Why HIGH risk?</Text>
-            {[
-              { icon: '🩺', text: 'Blood pressure 160/110 mmHg (Critical threshold)' },
-              { icon: '🤕', text: 'Severe headache + blurred vision (pre-eclampsia signs)' },
-              { icon: '🦶', text: 'Oedema present in face and hands' },
-              { icon: '📅', text: '32 weeks gestation — high-risk window' },
-            ].map((item, i) => (
-              <View key={i} style={styles.explainItem}>
-                <Text style={styles.explainIcon}>{item.icon}</Text>
-                <Text style={styles.explainText}>{item.text}</Text>
+            <Text style={styles.explainTitle}>Why {displayRisk} risk?</Text>
+            {displayReason ? (
+              <View style={styles.explainItem}>
+                <Text style={styles.explainIcon}>🔍</Text>
+                <Text style={styles.explainText}>{displayReason}</Text>
               </View>
-            ))}
+            ) : (
+              [
+                { icon: '🩺', text: t('expl_1') },
+                { icon: '🤕', text: t('expl_2') },
+                { icon: '🦶', text: t('expl_3') },
+                { icon: '📅', text: t('expl_4') },
+              ].map((item, i) => (
+                <View key={i} style={styles.explainItem}>
+                  <Text style={styles.explainIcon}>{item.icon}</Text>
+                  <Text style={styles.explainText}>{item.text}</Text>
+                </View>
+              ))
+            )}
           </View>
 
           <View style={styles.recommendCard}>
-            <Text style={styles.recommendTitle}>AI Recommendation</Text>
+            <Text style={styles.recommendTitle}>{t('ai_recommend')}</Text>
             <Text style={styles.recommendText}>
-              Immediate referral to PHC/CHC with obstetric emergency facility. Initiate magnesium sulphate if seizure risk. Monitor BP every 30 minutes.
+              {displayRec}
             </Text>
           </View>
 
           <View style={styles.confidenceCard}>
             <View style={styles.confidenceRow}>
-              <Text style={styles.confidenceLabel}>Model Confidence</Text>
-              <Text style={styles.confidenceValue}>92%</Text>
+              <Text style={styles.confidenceLabel}>{t('model_confidence')}</Text>
+              <Text style={styles.confidenceValue}>{numericConfidence}%</Text>
             </View>
             <View style={styles.confidenceTrack}>
-              <Animated.View style={[styles.confidenceFill, { width: '92%' }]} />
+              <Animated.View style={[styles.confidenceFill, { width: `${numericConfidence}%` }]} />
             </View>
             <Text style={styles.confidenceNote}>
-              Based on 15,000+ clinical cases from maternal health databases
+              {t('confidence_note')}
             </Text>
           </View>
 
           <View style={styles.actionButtons}>
             <Button
-              title="Generate Referral"
+              title={t('generate_referral')}
               onPress={() => router.push('/referral')}
               variant="primary"
               fullWidth
@@ -105,14 +125,14 @@ export default function AIResultScreen() {
               icon={<FileText size={18} color="#fff" />}
             />
             <Button
-              title="Ask AI"
+              title={t('ask_ai')}
               onPress={() => router.push('/ai/chatbot')}
               variant="outline"
               fullWidth
               icon={<MessageCircle size={18} color={Colors.primary} />}
             />
             <Button
-              title="Disagree with AI"
+              title={t('disagree_ai')}
               onPress={() => setDisagreeVisible(true)}
               variant="ghost"
               fullWidth
@@ -124,7 +144,7 @@ export default function AIResultScreen() {
           <View style={styles.auditNote}>
             <CheckCircle size={14} color={Colors.text.muted} />
             <Text style={styles.auditNoteText}>
-              This assessment has been logged to the audit trail
+              {t('audit_logged')}
             </Text>
           </View>
         </Animated.View>
@@ -138,20 +158,20 @@ export default function AIResultScreen() {
             {submitted ? (
               <View style={styles.modalSuccess}>
                 <CheckCircle size={48} color={Colors.risk.low} />
-                <Text style={styles.modalSuccessTitle}>Feedback Recorded</Text>
+                <Text style={styles.modalSuccessTitle}>{t('feedback_recorded')}</Text>
                 <Text style={styles.modalSuccessText}>
-                  Your clinical judgment has been logged for model improvement
+                  {t('feedback_recorded_sub')}
                 </Text>
               </View>
             ) : (
               <>
-                <Text style={styles.modalTitle}>Disagree with AI Decision</Text>
+                <Text style={styles.modalTitle}>{t('disagree_decision')}</Text>
                 <Text style={styles.modalSubtitle}>
-                  Your clinical expertise matters. Please provide your reason.
+                  {t('clinical_expertise')}
                 </Text>
                 <TextInput
                   style={styles.reasonInput}
-                  placeholder="Describe your clinical assessment…"
+                  placeholder={t('describe_assessment')}
                   value={disagreeReason}
                   onChangeText={setDisagreeReason}
                   multiline
@@ -163,14 +183,14 @@ export default function AIResultScreen() {
                     style={styles.cancelBtn}
                     onPress={() => setDisagreeVisible(false)}
                   >
-                    <Text style={styles.cancelBtnText}>Cancel</Text>
+                    <Text style={styles.cancelBtnText}>{t('cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.submitBtn, !disagreeReason && { opacity: 0.5 }]}
                     onPress={handleDisagree}
                     disabled={!disagreeReason}
                   >
-                    <Text style={styles.submitBtnText}>Submit Feedback</Text>
+                    <Text style={styles.submitBtnText}>{t('submit_feedback')}</Text>
                   </TouchableOpacity>
                 </View>
               </>

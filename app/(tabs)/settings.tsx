@@ -29,14 +29,16 @@ import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants
 import SyncStatus from '@/components/ui/SyncStatus';
 import { useSync } from '@/hooks/useSync';
 import { router } from 'expo-router';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function SettingsScreen() {
+  const { t, language: savedLang, setLanguage: setGlobalLang } = useLanguage();
   const { syncState, pendingCount, triggerSync } = useSync();
   const [autoSync, setAutoSync] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md');
-  const [language, setLanguage] = useState('English');
+  const [localLang, setLocalLang] = useState(savedLang === 'hi' ? 'हिन्दी' : 'English');
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -46,7 +48,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.title}>{t('settings')}</Text>
       </View>
 
       <Animated.ScrollView
@@ -68,67 +70,71 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
-        <SettingsSection title="Data & Sync" icon={<Database size={16} color={Colors.primary} />}>
+        <SettingsSection title={t('data_sync')} icon={<Database size={16} color={Colors.primary} />}>
           <SettingsRow
-            label="Auto-sync"
-            subtitle="Sync automatically when online"
+            label={t('auto_sync')}
+            subtitle={t('sync_auto')}
             right={<Switch value={autoSync} onValueChange={setAutoSync} trackColor={{ true: Colors.primary }} thumbColor="#FFFFFF" />}
           />
           <View style={styles.syncStatusRow}>
             <SyncStatus state={syncState} pendingCount={pendingCount} onSync={triggerSync} />
             <TouchableOpacity style={styles.manualSyncBtn} onPress={triggerSync}>
               <RefreshCw size={14} color={Colors.primary} />
-              <Text style={styles.manualSyncText}>Sync Now</Text>
+              <Text style={styles.manualSyncText}>{t('sync_now')}</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.infoBox}>
             <Info size={14} color={Colors.primary} />
             <Text style={styles.infoText}>
-              All records stored locally and synced securely when online. Data is encrypted with AES-256 and transmitted over TLS 1.3.
+              {t('records_info')}
             </Text>
           </View>
         </SettingsSection>
 
-        <SettingsSection title="Security" icon={<Shield size={16} color={Colors.primary} />}>
+        <SettingsSection title={t('security')} icon={<Shield size={16} color={Colors.primary} />}>
           <SettingsRow
-            label="Data Encryption"
-            subtitle="AES-256 encryption active"
-            right={<View style={styles.activeBadge}><Text style={styles.activeBadgeText}>Active</Text></View>}
+            label={t('data_encryption')}
+            subtitle={t('aes_active')}
+            right={<View style={styles.activeBadge}><Text style={styles.activeBadgeText}>{t('active_status')}</Text></View>}
           />
           <SettingsRow
-            label="Secure Transmission"
-            subtitle="TLS 1.3 protocol"
+            label={t('secure_transmission')}
+            subtitle={t('tls_protocol')}
             right={<Lock size={18} color={Colors.risk.low} />}
           />
           <SettingsRow
-            label="ABDM Compliance"
-            subtitle="FHIR-compatible data structure"
+            label={t('abdm_compliance')}
+            subtitle={t('fhir_structure')}
             right={<ChevronRight size={18} color={Colors.text.muted} />}
             onPress={() => {}}
           />
         </SettingsSection>
 
-        <SettingsSection title="Language" icon={<Globe size={16} color={Colors.primary} />}>
+        <SettingsSection title={t('language')} icon={<Globe size={16} color={Colors.primary} />}>
           {['English', 'हिन्दी', 'मराठी'].map((lang) => (
             <TouchableOpacity
               key={lang}
-              style={[styles.langOption, language === lang && styles.langOptionActive]}
-              onPress={() => setLanguage(lang)}
+              style={[styles.langOption, localLang === lang && styles.langOptionActive]}
+              onPress={() => {
+                setLocalLang(lang);
+                if (lang === 'हिन्दी') setGlobalLang('hi');
+                else setGlobalLang('en');
+              }}
             >
-              <Text style={[styles.langText, language === lang && styles.langTextActive]}>{lang}</Text>
-              {language === lang && <View style={styles.langDot} />}
+              <Text style={[styles.langText, localLang === lang && styles.langTextActive]}>{lang}</Text>
+              {localLang === lang && <View style={styles.langDot} />}
             </TouchableOpacity>
           ))}
         </SettingsSection>
 
-        <SettingsSection title="Appearance" icon={<Type size={16} color={Colors.primary} />}>
+        <SettingsSection title={t('appearance')} icon={<Type size={16} color={Colors.primary} />}>
           <SettingsRow
-            label="Dark Mode"
-            subtitle="Switch to dark theme"
+            label={t('dark_mode')}
+            subtitle={t('switch_dark')}
             right={<Switch value={darkMode} onValueChange={setDarkMode} trackColor={{ true: Colors.primary }} thumbColor="#FFFFFF" />}
           />
           <View style={styles.fontSizeRow}>
-            <Text style={styles.fontSizeLabel}>Font Size</Text>
+            <Text style={styles.fontSizeLabel}>{t('font_size')}</Text>
             <View style={styles.fontSizeBtns}>
               {(['sm', 'md', 'lg'] as const).map((size) => (
                 <TouchableOpacity
@@ -145,27 +151,27 @@ export default function SettingsScreen() {
           </View>
         </SettingsSection>
 
-        <SettingsSection title="Notifications" icon={<Bell size={16} color={Colors.primary} />}>
+        <SettingsSection title={t('notifications')} icon={<Bell size={16} color={Colors.primary} />}>
           <SettingsRow
-            label="High Risk Alerts"
-            subtitle="Get notified for critical cases"
+            label={t('high_risk_alerts')}
+            subtitle={t('get_notified')}
             right={<Switch value={notifications} onValueChange={setNotifications} trackColor={{ true: Colors.primary }} thumbColor="#FFFFFF" />}
           />
         </SettingsSection>
 
-        <SettingsSection title="About" icon={<Info size={16} color={Colors.primary} />}>
-          <SettingsRow label="Version" right={<Text style={styles.versionText}>v2.1.0</Text>} />
-          <SettingsRow label="Build" right={<Text style={styles.versionText}>2024.12</Text>} />
+        <SettingsSection title={t('about')} icon={<Info size={16} color={Colors.primary} />}>
+          <SettingsRow label={t('version')} right={<Text style={styles.versionText}>v2.1.0</Text>} />
+          <SettingsRow label={t('build')} right={<Text style={styles.versionText}>2024.12</Text>} />
           <SettingsRow
-            label="Ministry of Health & FW"
-            subtitle="Government of India initiative"
+            label={t('ministry')}
+            subtitle={t('gov_india')}
             right={<ChevronRight size={18} color={Colors.text.muted} />}
           />
         </SettingsSection>
 
         <TouchableOpacity style={styles.logoutBtn} onPress={() => router.replace('/auth/login')}>
           <LogOut size={18} color={Colors.risk.high} />
-          <Text style={styles.logoutText}>Logout</Text>
+          <Text style={styles.logoutText}>{t('logout')}</Text>
         </TouchableOpacity>
 
         <View style={{ height: 20 }} />
