@@ -14,6 +14,7 @@ import { router } from 'expo-router';
 import { ArrowLeft, Camera, FileText, CreditCard as Edit3, CircleCheck as CheckCircle, Wifi, WifiOff } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
+import { useLanguage } from '@/context/LanguageContext';
 
 type Step = 'scan' | 'preview' | 'edit';
 
@@ -28,6 +29,7 @@ const EXTRACTED_DATA = {
 };
 
 export default function ScanScreen() {
+  const { t } = useLanguage();
   const [step, setStep] = useState<Step>('scan');
   const [isOnline] = useState(Platform.OS === 'web');
   const [editData, setEditData] = useState(EXTRACTED_DATA);
@@ -68,7 +70,7 @@ export default function ScanScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.back}>
           <ArrowLeft size={22} color={Colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Document Scan</Text>
+        <Text style={styles.headerTitle}>{t('document_scan')}</Text>
         <View style={[styles.onlineTag, { backgroundColor: isOnline ? Colors.risk.lowLight : '#ECEFF1' }]}>
           {isOnline ? (
             <Wifi size={12} color={Colors.risk.low} />
@@ -76,7 +78,7 @@ export default function ScanScreen() {
             <WifiOff size={12} color={Colors.text.muted} />
           )}
           <Text style={[styles.onlineTagText, { color: isOnline ? Colors.risk.low : Colors.text.muted }]}>
-            {isOnline ? 'Online' : 'Offline'}
+            {isOnline ? t('online') : t('offline')}
           </Text>
         </View>
       </View>
@@ -105,7 +107,7 @@ export default function ScanScreen() {
                 <View style={[styles.corner, styles.cornerBR]} />
                 <Camera size={48} color="rgba(255,255,255,0.5)" />
                 <Text style={styles.cameraPlaceholder}>
-                  {scanning ? 'Scanning…' : 'Position document inside frame'}
+                  {scanning ? t('scanning_ellipsis') : t('position_doc')}
                 </Text>
               </View>
             </View>
@@ -114,16 +116,16 @@ export default function ScanScreen() {
               <View style={styles.offlineWarning}>
                 <WifiOff size={18} color={Colors.text.muted} />
                 <View style={styles.offlineText}>
-                  <Text style={styles.offlineTitle}>OCR unavailable offline</Text>
-                  <Text style={styles.offlineDesc}>Connect to internet to scan documents</Text>
+                  <Text style={styles.offlineTitle}>{t('ocr_unavailable')}</Text>
+                  <Text style={styles.offlineDesc}>{t('connect_internet')}</Text>
                 </View>
               </View>
             )}
 
             <View style={styles.docTypes}>
-              <Text style={styles.docTypesLabel}>Supported documents:</Text>
+              <Text style={styles.docTypesLabel}>{t('supported_docs')}</Text>
               <View style={styles.docTypesList}>
-                {['MCP Card', 'Antenatal Record', 'Lab Report', 'Referral Slip'].map((d) => (
+                {[t('mcp_card'), t('antenatal_record'), t('lab_report'), t('referral_slip')].map((d) => (
                   <View key={d} style={styles.docTypePill}>
                     <FileText size={12} color={Colors.primary} />
                     <Text style={styles.docTypePillText}>{d}</Text>
@@ -139,7 +141,7 @@ export default function ScanScreen() {
             >
               <Camera size={22} color={isOnline ? '#FFFFFF' : Colors.text.muted} />
               <Text style={[styles.scanBtnText, !isOnline && { color: Colors.text.muted }]}>
-                {scanning ? 'Scanning document…' : isOnline ? 'Scan Document' : 'Available when online'}
+                {scanning ? t('scanning_doc') : isOnline ? t('document_scan') : t('available_online')}
               </Text>
             </TouchableOpacity>
 
@@ -148,7 +150,7 @@ export default function ScanScreen() {
               onPress={() => setStep('edit')}
             >
               <Edit3 size={16} color={Colors.primary} />
-              <Text style={styles.manualBtnText}>Enter data manually instead</Text>
+              <Text style={styles.manualBtnText}>{t('enter_manual')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -157,15 +159,15 @@ export default function ScanScreen() {
           <View style={styles.previewSection}>
             <View style={styles.extractedBanner}>
               <CheckCircle size={18} color={Colors.risk.low} />
-              <Text style={styles.extractedText}>Data extracted successfully</Text>
+              <Text style={styles.extractedText}>{t('data_extracted')}</Text>
             </View>
 
             <View style={styles.previewCard}>
-              <Text style={styles.previewTitle}>Extracted Information</Text>
-              <Text style={styles.previewSub}>Review and correct if needed</Text>
+              <Text style={styles.previewTitle}>{t('extracted_info')}</Text>
+              <Text style={styles.previewSub}>{t('review_correct')}</Text>
               {Object.entries(EXTRACTED_DATA).map(([key, val]) => (
                 <View key={key} style={styles.previewRow}>
-                  <Text style={styles.previewKey}>{formatKey(key)}:</Text>
+                  <Text style={styles.previewKey}>{formatKey(key, t)}:</Text>
                   <Text style={styles.previewVal}>{val}</Text>
                 </View>
               ))}
@@ -174,11 +176,11 @@ export default function ScanScreen() {
             <View style={styles.btnRow}>
               <TouchableOpacity style={styles.editBtn} onPress={() => setStep('edit')}>
                 <Edit3 size={16} color={Colors.primary} />
-                <Text style={styles.editBtnText}>Edit</Text>
+                <Text style={styles.editBtnText}>{t('edit')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.confirmBtn} onPress={() => setStep('edit')}>
                 <CheckCircle size={16} color="#fff" />
-                <Text style={styles.confirmBtnText}>Confirm & Save</Text>
+                <Text style={styles.confirmBtnText}>{t('confirm_save')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -186,10 +188,10 @@ export default function ScanScreen() {
 
         {step === 'edit' && (
           <View style={styles.editSection}>
-            <Text style={styles.editTitle}>Edit Extracted Data</Text>
+            <Text style={styles.editTitle}>{t('edit_extracted')}</Text>
             {Object.entries(editData).map(([key, val]) => (
               <View key={key} style={styles.editField}>
-                <Text style={styles.editLabel}>{formatKey(key)}</Text>
+                <Text style={styles.editLabel}>{formatKey(key, t)}</Text>
                 <TextInput
                   style={styles.editInput}
                   value={val}
@@ -206,10 +208,10 @@ export default function ScanScreen() {
               {saved ? (
                 <>
                   <CheckCircle size={18} color="#fff" />
-                  <Text style={styles.saveBtnText}>Saved!</Text>
+                  <Text style={styles.saveBtnText}>{t('save')}!</Text>
                 </>
               ) : (
-                <Text style={styles.saveBtnText}>Save to Patient Record</Text>
+                <Text style={styles.saveBtnText}>{t('save_patient_record')}</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -221,15 +223,15 @@ export default function ScanScreen() {
   );
 }
 
-function formatKey(key: string): string {
+function formatKey(key: string, t: any): string {
   const map: Record<string, string> = {
-    name: 'Patient Name',
-    age: 'Age',
-    lmp: 'Last Menstrual Period',
-    edd: 'Expected Delivery Date',
-    bp: 'Blood Pressure',
-    weight: 'Weight (kg)',
-    hb: 'Haemoglobin (g/dL)',
+    name: t('name'),
+    age: t('step_age'),
+    lmp: t('step_lmp'),
+    edd: t('step_edd'),
+    bp: t('step_bp'),
+    weight: t('step_weight'),
+    hb: t('step_hb'),
   };
   return map[key] ?? key;
 }

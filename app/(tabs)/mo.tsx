@@ -13,6 +13,7 @@ import { ClipboardList, CircleCheck as CheckCircle, Circle as XCircle, MessageSq
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
 import Badge from '@/components/ui/Badge';
+import { useLanguage } from '@/context/LanguageContext';
 
 const PENDING_CASES = [
   {
@@ -54,6 +55,7 @@ const PENDING_CASES = [
 ];
 
 export default function MODashboardScreen() {
+  const { t } = useLanguage();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
@@ -63,18 +65,18 @@ export default function MODashboardScreen() {
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>MO Dashboard</Text>
-          <Text style={styles.subtitle}>Dr. Priya Mehta · Medical Officer</Text>
+          <Text style={styles.title}>{t('mo_dashboard')}</Text>
+          <Text style={styles.subtitle}>{t('medical_officer_name')}</Text>
         </View>
         <View style={styles.pendingBadge}>
-          <Text style={styles.pendingText}>{PENDING_CASES.length} pending</Text>
+          <Text style={styles.pendingText}>{PENDING_CASES.length} {t('pending_lc')}</Text>
         </View>
       </View>
 
       <View style={styles.summaryRow}>
-        <SummaryBox label="Pending Reviews" value="3" color={Colors.risk.medium} />
-        <SummaryBox label="Reviewed Today" value="8" color={Colors.primary} />
-        <SummaryBox label="EPDS Alerts" value="2" color={Colors.risk.high} />
+        <SummaryBox label={t('pending_reviews')} value="3" color={Colors.risk.medium} />
+        <SummaryBox label={t('reviewed_today')} value="8" color={Colors.primary} />
+        <SummaryBox label={t('epds_alerts')} value="2" color={Colors.risk.high} />
       </View>
 
       <Animated.ScrollView
@@ -82,7 +84,7 @@ export default function MODashboardScreen() {
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.sectionTitle}>Pending Case Reviews</Text>
+        <Text style={styles.sectionTitle}>{t('pending_case_reviews')}</Text>
         {PENDING_CASES.map((c, i) => (
           <CaseReviewCard key={c.id} caseData={c} delay={i * 100} />
         ))}
@@ -102,6 +104,7 @@ function SummaryBox({ label, value, color }: { label: string; value: string; col
 }
 
 function CaseReviewCard({ caseData, delay }: { caseData: (typeof PENDING_CASES)[0]; delay: number }) {
+  const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   const [note, setNote] = useState('');
   const [status, setStatus] = useState<'pending' | 'accepted' | 'overridden'>('pending');
@@ -132,7 +135,7 @@ function CaseReviewCard({ caseData, delay }: { caseData: (typeof PENDING_CASES)[
       <Animated.View style={[styles.resolvedCard, { opacity: opacityAnim }]}>
         <CheckCircle size={20} color={status === 'accepted' ? Colors.risk.low : Colors.risk.medium} />
         <Text style={styles.resolvedText}>
-          {caseData.name} — {status === 'accepted' ? 'Accepted AI decision' : 'Decision overridden'}
+          {caseData.name} — {status === 'accepted' ? t('accepted_ai_decision') : t('decision_overridden')}
         </Text>
       </Animated.View>
     );
@@ -157,11 +160,11 @@ function CaseReviewCard({ caseData, delay }: { caseData: (typeof PENDING_CASES)[
         <View style={styles.aiSection}>
           <View style={styles.aiLabel}>
             <Brain size={14} color={Colors.primary} />
-            <Text style={styles.aiLabelText}>AI Recommendation</Text>
+            <Text style={styles.aiLabelText}>{t('ai_recommendation')}</Text>
           </View>
           <Text style={styles.aiDecision}>{caseData.aiDecision}</Text>
           <View style={styles.confidenceRow}>
-            <Text style={styles.confidenceLabel}>Confidence:</Text>
+            <Text style={styles.confidenceLabel}>{t('confidence')}</Text>
             <View style={styles.confidenceBar}>
               <View style={[styles.confidenceFill, { width: `${caseData.confidence * 100}%` }]} />
             </View>
@@ -172,15 +175,15 @@ function CaseReviewCard({ caseData, delay }: { caseData: (typeof PENDING_CASES)[
         {expanded && (
           <View style={styles.details}>
             <View style={styles.detailRow}>
-              <Text style={styles.detailKey}>BP:</Text>
+              <Text style={styles.detailKey}>{t('bp')}</Text>
               <Text style={styles.detailValue}>{caseData.bp} mmHg</Text>
             </View>
             <View style={styles.detailRow}>
-              <Text style={styles.detailKey}>Symptoms:</Text>
+              <Text style={styles.detailKey}>{t('symptoms')}</Text>
               <Text style={styles.detailValue}>{caseData.symptoms.join(', ')}</Text>
             </View>
             <View style={styles.detailRow}>
-              <Text style={styles.detailKey}>ANM Note:</Text>
+              <Text style={styles.detailKey}>{t('anm_note')}</Text>
               <Text style={styles.detailValue}>{caseData.anmNote}</Text>
             </View>
           </View>
@@ -190,7 +193,7 @@ function CaseReviewCard({ caseData, delay }: { caseData: (typeof PENDING_CASES)[
           <MessageSquare size={14} color={Colors.text.muted} />
           <TextInput
             style={styles.noteInput}
-            placeholder="Add clinical note…"
+            placeholder={t('add_clinical_note')}
             value={note}
             onChangeText={setNote}
             multiline
@@ -201,11 +204,11 @@ function CaseReviewCard({ caseData, delay }: { caseData: (typeof PENDING_CASES)[
         <View style={styles.actionRow}>
           <TouchableOpacity style={styles.acceptBtn} onPress={handleAccept}>
             <CheckCircle size={16} color="#FFFFFF" />
-            <Text style={styles.acceptText}>Accept</Text>
+            <Text style={styles.acceptText}>{t('accept')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.overrideBtn} onPress={handleOverride}>
             <XCircle size={16} color={Colors.risk.medium} />
-            <Text style={styles.overrideText}>Override</Text>
+            <Text style={styles.overrideText}>{t('override')}</Text>
           </TouchableOpacity>
         </View>
       </View>

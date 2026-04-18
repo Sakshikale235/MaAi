@@ -17,6 +17,7 @@ import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
 import Button from '@/components/ui/Button';
 import { UserRole } from '@/types';
+import { useLanguage } from '@/context/LanguageContext';
 
 const ROLES: { id: UserRole; label: string; desc: string; icon: string }[] = [
   { id: 'ANM', label: 'ANM', desc: 'Auxiliary Nurse Midwife — Field worker', icon: '👩‍⚕️' },
@@ -24,6 +25,7 @@ const ROLES: { id: UserRole; label: string; desc: string; icon: string }[] = [
 ];
 
 export default function SignupScreen() {
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [facility, setFacility] = useState('');
@@ -57,15 +59,15 @@ export default function SignupScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.back}>
           <ArrowLeft size={22} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Create Account</Text>
-        <Text style={styles.headerSub}>Register as a health worker</Text>
+        <Text style={styles.headerTitle}>{t('create_account')}</Text>
+        <Text style={styles.headerSub}>{t('register_as_health_worker')}</Text>
       </LinearGradient>
 
       <ScrollView style={styles.body} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <Animated.View
           style={[styles.card, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
         >
-          <Text style={styles.sectionTitle}>Select your role</Text>
+          <Text style={styles.sectionTitle}>{t('select_your_role')}</Text>
           <View style={styles.roleRow}>
             {ROLES.map((r) => (
               <TouchableOpacity
@@ -84,15 +86,15 @@ export default function SignupScreen() {
           <View style={styles.divider} />
 
           <InputField
-            label="Full Name"
-            placeholder="e.g. Sunita Sharma"
+            label={t('full_name')}
+            placeholder={t('enter_full_name')}
             value={name}
             onChangeText={setName}
             icon={<User size={18} color={Colors.text.muted} />}
           />
           <InputField
-            label="Mobile Number"
-            placeholder="10-digit mobile number"
+            label={t('mobile_number')}
+            placeholder={t('enter_10_digit')}
             value={phone}
             onChangeText={setPhone}
             keyboardType="number-pad"
@@ -100,15 +102,15 @@ export default function SignupScreen() {
             icon={<Phone size={18} color={Colors.text.muted} />}
           />
           <InputField
-            label="Health Facility"
-            placeholder="e.g. PHC Nashik"
+            label={t('phc_chc')}
+            placeholder={t('e_g_phc')}
             value={facility}
             onChangeText={setFacility}
             icon={<Building size={18} color={Colors.text.muted} />}
           />
 
           <Button
-            title="Register"
+            title={t('register')}
             onPress={handleRegister}
             loading={loading}
             disabled={!name || !phone || !role || !facility}
@@ -117,7 +119,7 @@ export default function SignupScreen() {
           />
 
           <TouchableOpacity onPress={() => router.back()} style={styles.link}>
-            <Text style={styles.linkText}>Already registered? <Text style={styles.linkBold}>Login</Text></Text>
+            <Text style={styles.linkText}>{t('already_have_account')} <Text style={styles.linkBold}>{t('login_here')}</Text></Text>
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>

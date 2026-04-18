@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import { TriangleAlert as AlertTriangle, Clock, ChevronRight, Phone, FileText } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
+import { useLanguage } from '@/context/LanguageContext';
 
 const ALERTS = [
   {
@@ -63,6 +64,7 @@ const urgencyConfig = {
 };
 
 export default function AlertsScreen() {
+  const { t } = useLanguage();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
@@ -74,19 +76,19 @@ export default function AlertsScreen() {
         <View style={styles.titleRow}>
           <AlertTriangle size={22} color={Colors.risk.high} />
           <View>
-            <Text style={styles.title}>High Risk Alerts</Text>
-            <Text style={styles.subtitle}>{ALERTS.length} patients need attention</Text>
+            <Text style={styles.title}>{t('high_risk_alerts')}</Text>
+            <Text style={styles.subtitle}>{ALERTS.length} {t('patients_need_attention')}</Text>
           </View>
         </View>
         <View style={styles.urgentBadge}>
-          <Text style={styles.urgentBadgeText}>{ALERTS.length} Active</Text>
+          <Text style={styles.urgentBadgeText}>{ALERTS.length} {t('active')}</Text>
         </View>
       </View>
 
       <View style={styles.banner}>
         <AlertTriangle size={16} color={Colors.risk.high} />
         <Text style={styles.bannerText}>
-          These patients require immediate clinical review or referral
+          {t('immediate_review_msg')}
         </Text>
       </View>
 
@@ -105,6 +107,7 @@ export default function AlertsScreen() {
 }
 
 function AlertCard({ alert, delay }: { alert: (typeof ALERTS)[0]; delay: number }) {
+  const { t } = useLanguage();
   const slideAnim = useRef(new Animated.Value(20)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -156,7 +159,7 @@ function AlertCard({ alert, delay }: { alert: (typeof ALERTS)[0]; delay: number 
         </View>
 
         <View style={styles.reasonBox}>
-          <Text style={styles.reasonLabel}>Risk factors:</Text>
+          <Text style={styles.reasonLabel}>{t('risk_factors')}</Text>
           <Text style={styles.reasonText}>{alert.reason}</Text>
         </View>
 
@@ -168,11 +171,11 @@ function AlertCard({ alert, delay }: { alert: (typeof ALERTS)[0]; delay: number 
           <View style={styles.actions}>
             <TouchableOpacity style={styles.actionBtn}>
               <Phone size={14} color={Colors.primary} />
-              <Text style={styles.actionText}>Call</Text>
+              <Text style={styles.actionText}>{t('call')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.actionBtn, styles.actionBtnPrimary]}>
               <FileText size={14} color="#FFFFFF" />
-              <Text style={[styles.actionText, styles.actionTextPrimary]}>Refer</Text>
+              <Text style={[styles.actionText, styles.actionTextPrimary]}>{t('refer')}</Text>
             </TouchableOpacity>
           </View>
         </View>

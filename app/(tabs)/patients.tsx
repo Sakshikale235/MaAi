@@ -15,6 +15,7 @@ import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
 import PatientCard from '@/components/patient/PatientCard';
 import { Patient, RiskLevel } from '@/types';
+import { useLanguage } from '@/context/LanguageContext';
 
 const PATIENTS: Patient[] = [
   { id: '1', name: 'Radha Kumari', age: 24, riskLevel: 'HIGH', lastVisit: 'Today', weeksPregnant: 32, village: 'Nashik', phone: '9876543210', synced: true, abhaId: 'ABHA001' },
@@ -33,6 +34,7 @@ const FILTERS: { label: string; value: RiskLevel | 'ALL' }[] = [
 ];
 
 export default function PatientsScreen() {
+  const { t } = useLanguage();
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState<RiskLevel | 'ALL'>('ALL');
 
@@ -59,22 +61,22 @@ export default function PatientsScreen() {
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Patients</Text>
-          <Text style={styles.subtitle}>{PATIENTS.length} registered</Text>
+          <Text style={styles.title}>{t('patients')}</Text>
+          <Text style={styles.subtitle}>{PATIENTS.length} {t('registered_count')}</Text>
         </View>
         <TouchableOpacity
           style={styles.addBtn}
           onPress={() => router.push('/patient/register')}
         >
           <UserPlus size={18} color="#FFFFFF" />
-          <Text style={styles.addBtnText}>Add</Text>
+          <Text style={styles.addBtnText}>{t('add')}</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.riskSummary}>
-        <RiskCount label="High" count={counts.HIGH} color={Colors.risk.high} bg={Colors.risk.highLight} />
-        <RiskCount label="Medium" count={counts.MEDIUM} color={Colors.risk.medium} bg={Colors.risk.mediumLight} />
-        <RiskCount label="Low" count={counts.LOW} color={Colors.risk.low} bg={Colors.risk.lowLight} />
+        <RiskCount label={t('high')} count={counts.HIGH} color={Colors.risk.high} bg={Colors.risk.highLight} />
+        <RiskCount label={t('medium')} count={counts.MEDIUM} color={Colors.risk.medium} bg={Colors.risk.mediumLight} />
+        <RiskCount label={t('low')} count={counts.LOW} color={Colors.risk.low} bg={Colors.risk.lowLight} />
       </View>
 
       <View style={styles.searchRow}>
@@ -82,7 +84,7 @@ export default function PatientsScreen() {
           <Search size={18} color={Colors.text.muted} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search patients…"
+            placeholder={t('search_patients')}
             value={search}
             onChangeText={setSearch}
             placeholderTextColor={Colors.text.muted}
@@ -94,17 +96,38 @@ export default function PatientsScreen() {
       </View>
 
       <ScrollView style={styles.filterRow} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-        {FILTERS.map((f) => (
           <TouchableOpacity
-            key={f.value}
-            onPress={() => setActiveFilter(f.value)}
-            style={[styles.chip, activeFilter === f.value && styles.chipActive]}
+            onPress={() => setActiveFilter('ALL')}
+            style={[styles.chip, activeFilter === 'ALL' && styles.chipActive]}
           >
-            <Text style={[styles.chipText, activeFilter === f.value && styles.chipTextActive]}>
-              {f.label}
+            <Text style={[styles.chipText, activeFilter === 'ALL' && styles.chipTextActive]}>
+              {t('all')}
             </Text>
           </TouchableOpacity>
-        ))}
+          <TouchableOpacity
+            onPress={() => setActiveFilter('HIGH')}
+            style={[styles.chip, activeFilter === 'HIGH' && styles.chipActive]}
+          >
+            <Text style={[styles.chipText, activeFilter === 'HIGH' && styles.chipTextActive]}>
+              {t('high_risk')}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setActiveFilter('MEDIUM')}
+            style={[styles.chip, activeFilter === 'MEDIUM' && styles.chipActive]}
+          >
+            <Text style={[styles.chipText, activeFilter === 'MEDIUM' && styles.chipTextActive]}>
+              {t('medium')}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setActiveFilter('LOW')}
+            style={[styles.chip, activeFilter === 'LOW' && styles.chipActive]}
+          >
+            <Text style={[styles.chipText, activeFilter === 'LOW' && styles.chipTextActive]}>
+              {t('low_risk')}
+            </Text>
+          </TouchableOpacity>
       </ScrollView>
 
       <Animated.ScrollView
@@ -115,7 +138,7 @@ export default function PatientsScreen() {
         {filtered.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyIcon}>🔍</Text>
-            <Text style={styles.emptyText}>No patients found</Text>
+            <Text style={styles.emptyText}>{t('no_patients_found')}</Text>
           </View>
         ) : (
           filtered.map((patient) => (

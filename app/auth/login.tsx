@@ -16,10 +16,12 @@ import { Phone, ArrowRight, Shield, Lock } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
 import Button from '@/components/ui/Button';
+import { useLanguage } from '@/context/LanguageContext';
 
 type Step = 'phone' | 'otp';
 
 export default function LoginScreen() {
+  const { t } = useLanguage();
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -80,15 +82,15 @@ export default function LoginScreen() {
     >
       <LinearGradient colors={['#0E7C86', '#4BBAC8']} style={styles.header}>
         <View style={styles.logoRow}>
-          <Text style={styles.logo}>⚕ MaaAI</Text>
+          <Text style={styles.logo}>{t('maa_ai')}</Text>
         </View>
         <Text style={styles.headerTitle}>
-          {step === 'phone' ? 'Welcome back' : 'Verify OTP'}
+          {step === 'phone' ? t('welcome_back') : t('verify_otp')}
         </Text>
         <Text style={styles.headerSub}>
           {step === 'phone'
-            ? 'Sign in with your registered mobile number'
-            : `OTP sent to +91 ${phone}`}
+            ? t('sign_in_prompt')
+            : `${t('otp_sent_to')} +91 ${phone}`}
         </Text>
       </LinearGradient>
 
@@ -99,14 +101,14 @@ export default function LoginScreen() {
           {step === 'phone' ? (
             <>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Mobile Number</Text>
+                <Text style={styles.label}>{t('mobile_number')}</Text>
                 <View style={styles.inputRow}>
                   <View style={styles.prefix}>
                     <Text style={styles.prefixText}>+91</Text>
                   </View>
                   <TextInput
                     style={styles.input}
-                    placeholder="Enter 10-digit number"
+                    placeholder={t('enter_10_digit')}
                     keyboardType="number-pad"
                     maxLength={10}
                     value={phone}
@@ -123,12 +125,12 @@ export default function LoginScreen() {
               <View style={styles.secureNote}>
                 <Shield size={14} color={Colors.primary} />
                 <Text style={styles.secureText}>
-                  Encrypted (AES-256) & secure (TLS 1.3)
+                  {t('encrypted_secure')}
                 </Text>
               </View>
 
               <Button
-                title="Send OTP"
+                title={t('send_otp')}
                 onPress={handleSendOtp}
                 loading={loading}
                 disabled={phone.length < 10}
@@ -138,12 +140,12 @@ export default function LoginScreen() {
               />
 
               <TouchableOpacity onPress={() => router.push('/auth/signup')} style={styles.link}>
-                <Text style={styles.linkText}>New user? <Text style={styles.linkBold}>Register here</Text></Text>
+                <Text style={styles.linkText}>{t('new_user')} <Text style={styles.linkBold}>{t('register_here')}</Text></Text>
               </TouchableOpacity>
             </>
           ) : (
             <>
-              <Text style={styles.otpTitle}>Enter 6-digit OTP</Text>
+              <Text style={styles.otpTitle}>{t('enter_6_digit_otp')}</Text>
               <View style={styles.otpRow}>
                 {otp.map((digit, i) => (
                   <TextInput
@@ -162,16 +164,16 @@ export default function LoginScreen() {
 
               <View style={styles.resendRow}>
                 {timer > 0 ? (
-                  <Text style={styles.timerText}>Resend in {timer}s</Text>
+                  <Text style={styles.timerText}>{t('resend_in')} {timer}s</Text>
                 ) : (
                   <TouchableOpacity onPress={() => { setTimer(30); }}>
-                    <Text style={styles.resendText}>Resend OTP</Text>
+                    <Text style={styles.resendText}>{t('resend_otp')}</Text>
                   </TouchableOpacity>
                 )}
               </View>
 
               <Button
-                title="Verify & Login"
+                title={t('verify_and_login')}
                 onPress={handleVerify}
                 loading={loading}
                 disabled={otp.some((d) => !d)}
@@ -183,7 +185,7 @@ export default function LoginScreen() {
                 onPress={() => { fadeAnim.setValue(0); slideAnim.setValue(30); setStep('phone'); }}
                 style={styles.link}
               >
-                <Text style={styles.linkText}>← Change number</Text>
+                <Text style={styles.linkText}>{t('change_number')}</Text>
               </TouchableOpacity>
             </>
           )}
@@ -191,7 +193,7 @@ export default function LoginScreen() {
 
         <View style={styles.footer}>
           <Lock size={12} color={Colors.text.muted} />
-          <Text style={styles.footerText}>Your data is encrypted and stored securely</Text>
+          <Text style={styles.footerText}>{t('data_encrypted')}</Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

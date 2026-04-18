@@ -16,14 +16,16 @@ import SyncStatus from '@/components/ui/SyncStatus';
 import HeroSection from '@/components/dashboard/HeroSection';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import { useSync } from '@/hooks/useSync';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function DashboardScreen() {
+  const { t } = useLanguage();
   const { syncState, pendingCount, triggerSync } = useSync();
   const [greeting] = useState(() => {
     const h = new Date().getHours();
-    if (h < 12) return 'Good morning';
-    if (h < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (h < 12) return 'good_morning';
+    if (h < 17) return 'good_afternoon';
+    return 'good_evening';
   });
 
   const headerAnim = useRef(new Animated.Value(0)).current;
@@ -40,7 +42,7 @@ export default function DashboardScreen() {
     <SafeAreaView style={styles.safe}>
       <Animated.View style={[styles.header, { opacity: headerAnim }]}>
         <View style={styles.headerLeft}>
-          <Text style={styles.greeting}>{greeting},</Text>
+          <Text style={styles.greeting}>{t(greeting as any)},</Text>
           <Text style={styles.userName}>ANM Sunita</Text>
         </View>
         <View style={styles.headerRight}>
@@ -65,48 +67,49 @@ export default function DashboardScreen() {
         </Animated.View>
 
         <View style={styles.statsRow}>
-          <StatPill label="Total" value="48" color={Colors.primary} />
-          <StatPill label="High Risk" value="7" color={Colors.risk.high} />
-          <StatPill label="Pending" value="3" color={Colors.risk.medium} />
-          <StatPill label="Synced" value="45" color={Colors.risk.low} />
+          <StatPill label={t('total')} value="48" color={Colors.primary} />
+          <StatPill label={t('high_risk')} value="7" color={Colors.risk.high} />
+          <StatPill label={t('pending')} value="3" color={Colors.risk.medium} />
+          <StatPill label={t('synced')} value="45" color={Colors.risk.low} />
         </View>
 
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
+        <Text style={styles.sectionTitle}>{t('quick_actions')}</Text>
         <View style={styles.grid}>
           <DashboardCard
             icon={<UserPlus size={22} color="#FFFFFF" />}
-            title="Add New Patient"
-            subtitle="Register & assess"
+            title={t('add_new_patient')}
+            subtitle={t('register_assess')}
             onPress={() => router.push('/patient/register')}
             variant="primary"
           />
           <DashboardCard
             icon={<Users size={22} color={Colors.primary} />}
-            title="Patient List"
-            subtitle="View all 48 patients"
+            title={t('patient_list')}
+            subtitle={t('view_all_patients')}
             onPress={() => router.push('/(tabs)/patients')}
           />
           <DashboardCard
             icon={<AlertTriangle size={22} color={Colors.risk.high} />}
-            title="High Risk Alerts"
-            subtitle="7 need attention"
+            title={t('high_risk_alerts')}
+            subtitle={`7 ${t('need_attention')}`}
             onPress={() => router.push('/(tabs)/alerts')}
             variant="alert"
             badge={7}
           />
           <DashboardCard
             icon={<MessageCircle size={22} color={Colors.primary} />}
-            title="AI Chatbot"
-            subtitle="Ask clinical questions"
+            title={t('ai_chatbot')}
+            subtitle={t('ask_clinical')}
             onPress={() => router.push('/ai/chatbot')}
           />
         </View>
 
-        <Text style={styles.sectionTitle}>Recent Activity</Text>
+        <Text style={styles.sectionTitle}>{t('recent_activity')}</Text>
         <View style={styles.activityList}>
-          {RECENT_ACTIVITY.map((item, i) => (
-            <ActivityItem key={i} item={item} />
-          ))}
+          <ActivityItem name="Radha Kumari" actionKey="assessment_completed" actionParams=" · HIGH risk" time="2h ago" color={Colors.risk.high} />
+          <ActivityItem name="Meena Devi" actionKey="referral_generated" actionParams="" time="4h ago" color={Colors.risk.medium} />
+          <ActivityItem name="Parvati Singh" actionKey="epds_screening" actionParams="" time="6h ago" color={Colors.risk.low} />
+          <ActivityItem name="Kavita Rao" actionKey="data_synced" actionParams="" time="8h ago" color={Colors.primary} />
         </View>
 
         <View style={{ height: 20 }} />
@@ -132,25 +135,19 @@ function StatPill({ label, value, color }: { label: string; value: string; color
   );
 }
 
-function ActivityItem({ item }: { item: (typeof RECENT_ACTIVITY)[0] }) {
+function ActivityItem({ name, actionKey, actionParams, time, color }: { name: string, actionKey: string, actionParams: string, time: string, color: string }) {
+  const { t } = useLanguage();
   return (
     <View style={styles.activityItem}>
-      <View style={[styles.activityDot, { backgroundColor: item.color }]} />
+      <View style={[styles.activityDot, { backgroundColor: color }]} />
       <View style={styles.activityInfo}>
-        <Text style={styles.activityName}>{item.name}</Text>
-        <Text style={styles.activityAction}>{item.action}</Text>
+        <Text style={styles.activityName}>{name}</Text>
+        <Text style={styles.activityAction}>{t(actionKey as any)}{actionParams}</Text>
       </View>
-      <Text style={styles.activityTime}>{item.time}</Text>
+      <Text style={styles.activityTime}>{time}</Text>
     </View>
   );
 }
-
-const RECENT_ACTIVITY = [
-  { name: 'Radha Kumari', action: 'Assessment completed · HIGH risk', time: '2h ago', color: Colors.risk.high },
-  { name: 'Meena Devi', action: 'Referral generated', time: '4h ago', color: Colors.risk.medium },
-  { name: 'Parvati Singh', action: 'EPDS screening done', time: '6h ago', color: Colors.risk.low },
-  { name: 'Kavita Rao', action: 'Data synced to ABDM', time: '8h ago', color: Colors.primary },
-];
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },

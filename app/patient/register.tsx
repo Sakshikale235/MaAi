@@ -17,8 +17,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
 import Button from '@/components/ui/Button';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function PatientRegisterScreen() {
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [phone, setPhone] = useState('');
@@ -51,8 +53,8 @@ export default function PatientRegisterScreen() {
       <View style={styles.savedScreen}>
         <Animated.View style={styles.savedContent}>
           <Text style={styles.savedIcon}>✅</Text>
-          <Text style={styles.savedTitle}>Patient Registered!</Text>
-          <Text style={styles.savedSub}>Saved locally · Starting assessment…</Text>
+          <Text style={styles.savedTitle}>{t('patient_registered')}</Text>
+          <Text style={styles.savedSub}>{t('starting_assessment')}</Text>
         </Animated.View>
       </View>
     );
@@ -64,8 +66,8 @@ export default function PatientRegisterScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.back}>
           <ArrowLeft size={22} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>New Patient</Text>
-        <Text style={styles.headerSub}>Register & begin assessment</Text>
+        <Text style={styles.headerTitle}>{t('new_patient')}</Text>
+        <Text style={styles.headerSub}>{t('register_begin')}</Text>
       </LinearGradient>
 
       <KeyboardAvoidingView
@@ -79,28 +81,28 @@ export default function PatientRegisterScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Patient Information</Text>
+            <Text style={styles.sectionTitle}>{t('patient_info')}</Text>
 
-            <Field label="Full Name *" placeholder="e.g. Radha Kumari" value={name} onChange={setName} icon={<User size={18} color={Colors.text.muted} />} />
-            <Field label="Age *" placeholder="e.g. 24" value={age} onChange={setAge} keyboardType="number-pad" icon={<Calendar size={18} color={Colors.text.muted} />} />
-            <Field label="Mobile Number" placeholder="10-digit number" value={phone} onChange={setPhone} keyboardType="number-pad" icon={<Phone size={18} color={Colors.text.muted} />} />
-            <Field label="Village / Locality *" placeholder="e.g. Nashik" value={village} onChange={setVillage} icon={<MapPin size={18} color={Colors.text.muted} />} />
-            <Field label="Weeks Pregnant" placeholder="e.g. 28" value={weeks} onChange={setWeeks} keyboardType="number-pad" icon={<Calendar size={18} color={Colors.text.muted} />} />
+            <Field label={t('full_name')} placeholder={t('eg_radha_kumari')} value={name} onChange={setName} icon={<User size={18} color={Colors.text.muted} />} />
+            <Field label={t('age_required')} placeholder="e.g. 24" value={age} onChange={setAge} keyboardType="number-pad" icon={<Calendar size={18} color={Colors.text.muted} />} />
+            <Field label={t('mobile_number')} placeholder={t('enter_10_digit')} value={phone} onChange={setPhone} keyboardType="number-pad" icon={<Phone size={18} color={Colors.text.muted} />} />
+            <Field label={t('village_locality')} placeholder="e.g. Nashik" value={village} onChange={setVillage} icon={<MapPin size={18} color={Colors.text.muted} />} />
+            <Field label={t('weeks_pregnant')} placeholder="e.g. 28" value={weeks} onChange={setWeeks} keyboardType="number-pad" icon={<Calendar size={18} color={Colors.text.muted} />} />
           </View>
 
           <View style={styles.card}>
             <View style={styles.abhaHeader}>
               <Link size={18} color={Colors.primary} />
               <View>
-                <Text style={styles.abhaTitle}>ABHA ID (Optional)</Text>
-                <Text style={styles.abhaSub}>Link patient to national digital health record</Text>
+                <Text style={styles.abhaTitle}>{t('abha_id')}</Text>
+                <Text style={styles.abhaSub}>{t('link_abha')}</Text>
               </View>
             </View>
             <View style={styles.abhaInput}>
               <Hash size={18} color={Colors.text.muted} />
               <TextInput
                 style={styles.abhaTextInput}
-                placeholder="14-digit ABHA number"
+                placeholder={t('abha_placeholder')}
                 value={abhaId}
                 onChangeText={setAbhaId}
                 keyboardType="number-pad"
@@ -110,7 +112,7 @@ export default function PatientRegisterScreen() {
             </View>
             <View style={styles.abhaNote}>
               <Text style={styles.abhaNoteTxt}>
-                ABHA enables seamless sharing of health records across ABDM-enabled facilities
+                {t('abha_note')}
               </Text>
             </View>
           </View>
@@ -118,12 +120,12 @@ export default function PatientRegisterScreen() {
           <View style={styles.offlineNote}>
             <Text style={styles.offlineIcon}>📱</Text>
             <Text style={styles.offlineTxt}>
-              Data saved locally · Will sync when online
+              {t('data_saved_locally')}
             </Text>
           </View>
 
           <Button
-            title="Save & Start Assessment"
+            title={t('save_start_assessment')}
             onPress={handleSave}
             loading={loading}
             disabled={!name || !age || !village}

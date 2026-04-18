@@ -12,8 +12,10 @@ import { router } from 'expo-router';
 import { ArrowLeft, Download, Share2, CircleCheck as CheckCircle, MapPin, User, Calendar } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, FontWeight, Shadow, Spacing } from '@/constants/theme';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function ReferralScreen() {
+  const { t } = useLanguage();
   const [generated, setGenerated] = useState(false);
   const [shared, setShared] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -40,11 +42,11 @@ export default function ReferralScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.back}>
           <ArrowLeft size={22} color={Colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Referral Slip</Text>
+        <Text style={styles.headerTitle}>{t('referral_slip')}</Text>
         {generated && (
           <View style={styles.genBadge}>
             <CheckCircle size={12} color={Colors.risk.low} />
-            <Text style={styles.genBadgeText}>Generated</Text>
+            <Text style={styles.genBadgeText}>{t('generated')}</Text>
           </View>
         )}
       </View>
@@ -53,7 +55,7 @@ export default function ReferralScreen() {
         {!generated ? (
           <View style={styles.generating}>
             <Text style={styles.generatingIcon}>⏳</Text>
-            <Text style={styles.generatingText}>Generating referral slip…</Text>
+            <Text style={styles.generatingText}>{t('generating_slip')}</Text>
           </View>
         ) : (
           <Animated.View
@@ -61,68 +63,68 @@ export default function ReferralScreen() {
           >
             <View style={styles.slipHeader}>
               <View style={styles.slipLogo}>
-                <Text style={styles.slipLogoText}>⚕ MaaAI</Text>
+                <Text style={styles.slipLogoText}>{t('maa_ai')}</Text>
               </View>
               <View>
-                <Text style={styles.slipTitle}>Emergency Referral Slip</Text>
-                <Text style={styles.slipDate}>Date: {new Date().toLocaleDateString('en-IN')}</Text>
-                <Text style={styles.slipRef}>Ref: MH-2024-{Math.floor(Math.random() * 9000 + 1000)}</Text>
+                <Text style={styles.slipTitle}>{t('emergency_slip')}</Text>
+                <Text style={styles.slipDate}>{t('date')}: {new Date().toLocaleDateString('en-IN')}</Text>
+                <Text style={styles.slipRef}>{t('ref')}: MH-2024-{Math.floor(Math.random() * 9000 + 1000)}</Text>
               </View>
             </View>
 
             <View style={styles.slipDivider} />
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>PATIENT DETAILS</Text>
-              <SlipRow icon={<User size={14} color={Colors.text.muted} />} label="Name" value="Radha Kumari" />
-              <SlipRow icon={<Calendar size={14} color={Colors.text.muted} />} label="Age / Gestation" value="24 yrs / 32 weeks" />
-              <SlipRow icon={<MapPin size={14} color={Colors.text.muted} />} label="Village" value="Nashik, Maharashtra" />
+              <Text style={styles.sectionLabel}>{t('patient_details_label')}</Text>
+              <SlipRow icon={<User size={14} color={Colors.text.muted} />} label={t('name')} value="Radha Kumari" />
+              <SlipRow icon={<Calendar size={14} color={Colors.text.muted} />} label={t('age_gestation')} value="24 yrs / 32 weeks" />
+              <SlipRow icon={<MapPin size={14} color={Colors.text.muted} />} label={t('village')} value="Nashik, Maharashtra" />
               <SlipRow label="ABHA ID" value="ABHA-1234-5678-9012" />
-              <SlipRow label="Blood Group" value="B+" />
+              <SlipRow label={t('blood_group')} value="B+" />
             </View>
 
             <View style={styles.slipDivider} />
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>CLINICAL FINDINGS</Text>
-              <SlipRow label="Blood Pressure" value="160/110 mmHg" highlight />
-              <SlipRow label="Symptoms" value="Severe headache, Blurred vision, Oedema" />
-              <SlipRow label="AI Risk Level" value="HIGH RISK" highlight />
-              <SlipRow label="AI Confidence" value="92%" />
+              <Text style={styles.sectionLabel}>{t('clinical_findings')}</Text>
+              <SlipRow label={t('step_bp')} value="160/110 mmHg" highlight />
+              <SlipRow label={t('step_symp')} value="Severe headache, Blurred vision, Oedema" />
+              <SlipRow label={t('ai_risk_level')} value="HIGH RISK" highlight />
+              <SlipRow label={t('ai_confidence')} value="92%" />
             </View>
 
             <View style={styles.slipDivider} />
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>REFERRAL DETAILS</Text>
-              <SlipRow label="Referred From" value="PHC Nashik · ANM Sunita Sharma" />
-              <SlipRow label="Referred To" value="District Hospital, Nashik" />
-              <SlipRow label="Urgency" value="EMERGENCY" highlight />
-              <SlipRow label="Reason" value="Suspected severe pre-eclampsia. Immediate obstetric care required." />
+              <Text style={styles.sectionLabel}>{t('referral_details')}</Text>
+              <SlipRow label={t('referred_from')} value="PHC Nashik · ANM Sunita Sharma" />
+              <SlipRow label={t('referred_to')} value="District Hospital, Nashik" />
+              <SlipRow label={t('urgency')} value="EMERGENCY" highlight />
+              <SlipRow label={t('reason')} value="Suspected severe pre-eclampsia. Immediate obstetric care required." />
             </View>
 
             <View style={styles.urgencyBanner}>
               <Text style={styles.urgencyBannerText}>
-                ⚠ EMERGENCY REFERRAL — Please prioritize this patient
+                {t('emergency_priority')}
               </Text>
             </View>
 
             <View style={styles.slipDivider} />
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>REFERRING CLINICIAN</Text>
-              <SlipRow label="Name" value="ANM Sunita Sharma" />
-              <SlipRow label="Facility" value="PHC Nashik, Block Igatpuri" />
-              <SlipRow label="Contact" value="+91 98765 43210" />
+              <Text style={styles.sectionLabel}>{t('referring_clinician')}</Text>
+              <SlipRow label={t('name')} value="ANM Sunita Sharma" />
+              <SlipRow label={t('facility')} value="PHC Nashik, Block Igatpuri" />
+              <SlipRow label={t('contact')} value="+91 98765 43210" />
               <View style={styles.signatureLine}>
-                <Text style={styles.signatureText}>Signature: _________________</Text>
-                <Text style={styles.signatureText}>Stamp: _________________</Text>
+                <Text style={styles.signatureText}>{t('signature')}: _________________</Text>
+                <Text style={styles.signatureText}>{t('stamp')}: _________________</Text>
               </View>
             </View>
 
             <View style={styles.footerNote}>
               <Text style={styles.footerNoteText}>
-                Generated by MaaAI · AI-powered maternal health system · ABDM compliant
+                {t('footer_note')}
               </Text>
             </View>
           </Animated.View>
@@ -135,7 +137,7 @@ export default function ReferralScreen() {
         <View style={styles.bottomBar}>
           <TouchableOpacity style={styles.downloadBtn}>
             <Download size={18} color={Colors.primary} />
-            <Text style={styles.downloadText}>Download PDF</Text>
+            <Text style={styles.downloadText}>{t('download_pdf')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.shareBtn, shared && styles.shareBtnSuccess]}
@@ -144,12 +146,12 @@ export default function ReferralScreen() {
             {shared ? (
               <>
                 <CheckCircle size={18} color="#FFFFFF" />
-                <Text style={styles.shareText}>Shared!</Text>
+                <Text style={styles.shareText}>{t('shared')}</Text>
               </>
             ) : (
               <>
                 <Share2 size={18} color="#FFFFFF" />
-                <Text style={styles.shareText}>Share</Text>
+                <Text style={styles.shareText}>{t('share')}</Text>
               </>
             )}
           </TouchableOpacity>
