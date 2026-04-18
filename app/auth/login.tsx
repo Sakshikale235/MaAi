@@ -56,11 +56,14 @@ export default function LoginScreen() {
   };
 
   const handleOtpChange = (val: string, idx: number) => {
+    const digit = val.replace(/[^0-9]/g, '').slice(0, 1);
+
     const next = [...otp];
-    next[idx] = val;
+    next[idx] = digit;
     setOtp(next);
-    if (val && idx < 5) otpRefs.current[idx + 1]?.focus();
-    if (!val && idx > 0) otpRefs.current[idx - 1]?.focus();
+
+    if (digit && idx < 5) otpRefs.current[idx + 1]?.focus();
+    if (!digit && idx > 0) otpRefs.current[idx - 1]?.focus();
   };
 
   const handleVerify = async () => {
@@ -107,7 +110,10 @@ export default function LoginScreen() {
                     keyboardType="number-pad"
                     maxLength={10}
                     value={phone}
-                    onChangeText={setPhone}
+                    onChangeText={(val) => {
+                      const cleaned = val.replace(/[^0-9]/g, '').slice(0, 10);
+                      setPhone(cleaned);
+                    }}
                     placeholderTextColor={Colors.text.muted}
                   />
                   <Phone size={18} color={Colors.text.muted} style={styles.inputIcon} />

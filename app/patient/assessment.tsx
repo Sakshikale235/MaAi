@@ -39,6 +39,14 @@ export default function AssessmentScreen() {
   const [muac, setMuac] = useState<number | null>(null);
   const [fhr, setFhr] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [name, setName] = useState('');
+  const [age, setAge] = useState('');
+  const [gravida, setGravida] = useState('');
+  const [parity, setParity] = useState('');
+  const [hb, setHb] = useState('');
+  const [weight, setWeight] = useState('');
+  const [prevWeight, setPrevWeight] = useState('');
+  const [tetanus, setTetanus] = useState('Not taken');
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -82,6 +90,116 @@ export default function AssessmentScreen() {
     return Colors.risk.low;
   };
 
+  const calculateRisk = () => {
+    let level = "LOW";
+    let alerts = [];
+
+    const ageVal = parseInt(age) || 0;
+    const gravidaVal = parseInt(gravida) || 0;
+    const parityVal = parseInt(parity) || 0;
+    const sys = parseInt(bpSys) || 0;
+    const dia = parseInt(bpDia) || 0;
+    const fhrVal = parseInt(fhr) || 0;
+    const hbVal = parseFloat(hb) || 0;
+    const wtGain = (parseFloat(weight) || 0) - (parseFloat(prevWeight) || 0);
+
+
+
+    // -----------------------
+    // 🚨 CRITICAL RULES (override everything)
+    // -----------------------
+
+    // BP emergency
+    if (sys >= 160 || dia >= 110) {
+      level = "HIGH";
+      alerts.push("Critical BP (Severe Hypertension)");
+    }
+
+    // No FHS
+    if (fhr === "") {
+      level = "HIGH";
+      alerts.push("Foetal Heart Sound not detected");
+    }
+
+    // Abnormal FHS
+    if (fhrVal > 0 && (fhrVal < 110 || fhrVal > 160)) {
+      level = "HIGH";
+      alerts.push("Abnormal Foetal Heart Rate");
+    }
+
+    // No fetal movement in late pregnancy
+    if (symptoms.includes("Decreased fetal movement")) {
+      level = "HIGH";
+      alerts.push("Reduced Foetal Movement");
+    }
+
+    // Severe anemia
+    if (hbVal > 0 && hbVal < 7) {
+      level = "HIGH";
+      alerts.push("Severe Anaemia");
+    }
+
+    // Danger signs present
+    if (
+      symptoms.includes("Convulsions") ||
+      symptoms.includes("Loss of consciousness") ||
+      symptoms.includes("Vaginal bleeding")
+    ) {
+      level = "HIGH";
+      alerts.push("Danger signs present");
+    }
+
+    // -----------------------
+    // ⚠️ MODERATE RULES
+    // -----------------------
+
+    // High BP (not critical)
+    if ((sys >= 140 || dia >= 90) && level !== "HIGH") {
+      level = "MODERATE";
+      alerts.push("High Blood Pressure");
+    }
+
+    // Moderate anemia
+    if (hbVal >= 7 && hbVal < 11 && level !== "HIGH") {
+      level = "MODERATE";
+      alerts.push("Mild/Moderate Anaemia");
+    }
+
+    // MUAC risk
+    if (muac !== null && muac < 23 && level !== "HIGH") {
+      level = "MODERATE";
+      alerts.push("Low MUAC (Malnutrition risk)");
+    }
+
+    // Poor weight gain
+    if (wtGain < 1 && level !== "HIGH") {
+      level = "MODERATE";
+      alerts.push("Low weight gain");
+    }
+
+    // Age risk
+    if ((ageVal < 18 || ageVal > 35) && level !== "HIGH") {
+      level = "MODERATE";
+      alerts.push("Age-related risk");
+    }
+
+    // High parity risk
+    if (parityVal >= 4 && level !== "HIGH") {
+      level = "MODERATE";
+      alerts.push("High parity risk");
+    }
+
+    // -----------------------
+    // 💉 PREVENTIVE (never increases severity)
+    // -----------------------
+
+    if (tetanus === "Not taken") {
+      alerts.push("Tetanus vaccine pending");
+    }
+
+    return { level, alerts };
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <LinearGradient colors={['#0E7C86', '#4BBAC8']} style={styles.header}>
@@ -104,7 +222,16 @@ export default function AssessmentScreen() {
         showsVerticalScrollIndicator={false}
       >
         {step === 1 && (
-          <BPStep bpSys={bpSys} bpDia={bpDia} onSysChange={setBpSys} onDiaChange={setBpDia} />
+          <BPStep
+            bpSys={bpSys} bpDia={bpDia} onSysChange={setBpSys} onDiaChange={setBpDia}
+            name={name} onNameChange={setName}
+            age={age} onAgeChange={setAge}
+            gravida={gravida} onGravidaChange={setGravida}
+            parity={parity} onParityChange={setParity}
+            hb={hb} onHbChange={setHb}
+            weight={weight} onWeightChange={setWeight}
+            prevWeight={prevWeight} onPrevWeightChange={setPrevWeight}
+          />
         )}
         {step === 2 && (
           <SymptomsStep symptoms={symptoms} onToggle={toggleSymptom} />
@@ -159,9 +286,24 @@ export default function AssessmentScreen() {
   );
 }
 
-function BPStep({ bpSys, bpDia, onSysChange, onDiaChange }: {
-  bpSys: string; bpDia: string;
-  onSysChange: (v: string) => void; onDiaChange: (v: string) => void;
+function BPStep({
+  bpSys, bpDia, onSysChange, onDiaChange,
+  name, onNameChange,
+  age, onAgeChange,
+  gravida, onGravidaChange,
+  parity, onParityChange,
+  hb, onHbChange,
+  weight, onWeightChange,
+  prevWeight, onPrevWeightChange
+}: {
+  bpSys: string; bpDia: string; onSysChange: (v: string) => void; onDiaChange: (v: string) => void;
+  name: string; onNameChange: (v: string) => void;
+  age: string; onAgeChange: (v: string) => void;
+  gravida: string; onGravidaChange: (v: string) => void;
+  parity: string; onParityChange: (v: string) => void;
+  hb: string; onHbChange: (v: string) => void;
+  weight: string; onWeightChange: (v: string) => void;
+  prevWeight: string; onPrevWeightChange: (v: string) => void;
 }) {
   const sys = parseInt(bpSys) || 0;
   const dia = parseInt(bpDia) || 0;
@@ -171,11 +313,58 @@ function BPStep({ bpSys, bpDia, onSysChange, onDiaChange }: {
   return (
     <View style={styles.stepContent}>
       <View style={styles.bpCard}>
+        <Text style={styles.bpLabel}>Patient Name</Text>
+        <TextInput style={styles.standardInput} value={name} onChangeText={onNameChange} placeholder="Enter name" placeholderTextColor={Colors.text.muted} />
+
+        <View style={styles.rowInputs}>
+          <View style={styles.halfInput}>
+            <Text style={styles.bpLabel}>Age</Text>
+            <TextInput style={styles.standardInput} value={age} onChangeText={(val) => onAgeChange(val.replace(/\D/g, '').slice(0, 3))}
+              keyboardType="number-pad"
+              placeholder="Age" placeholderTextColor={Colors.text.muted} />
+          </View>
+          <View style={styles.halfInput}>
+            <Text style={styles.bpLabel}>Hemoglobin</Text>
+            <TextInput style={styles.standardInput} value={hb} onChangeText={(val) => onHbChange(val.replace(/[^0-9.]/g, '').slice(0, 4))}
+              keyboardType="decimal-pad"
+              placeholder="g/dL" placeholderTextColor={Colors.text.muted} />
+          </View>
+        </View>
+
+        <View style={styles.rowInputs}>
+          <View style={styles.halfInput}>
+            <Text style={styles.bpLabel}>Gravida</Text>
+            <TextInput style={styles.standardInput} value={gravida} onChangeText={(val) => onGravidaChange(val.replace(/\D/g, '').slice(0, 2))}
+              keyboardType="number-pad" placeholder="e.g. 2" placeholderTextColor={Colors.text.muted} />
+          </View>
+          <View style={styles.halfInput}>
+            <Text style={styles.bpLabel}>Parity</Text>
+            <TextInput style={styles.standardInput} value={parity} onChangeText={(val) => onParityChange(val.replace(/\D/g, '').slice(0, 2))}
+              keyboardType="number-pad" placeholder="e.g. 1" placeholderTextColor={Colors.text.muted} />
+          </View>
+        </View>
+
+        <View style={styles.rowInputs}>
+          <View style={styles.halfInput}>
+            <Text style={styles.bpLabel}>Current Weight</Text>
+            <TextInput style={styles.standardInput} value={weight} onChangeText={(val) => onWeightChange(val.replace(/[^0-9.]/g, '').slice(0, 5))}
+              keyboardType="decimal-pad" placeholder="kg" placeholderTextColor={Colors.text.muted} />
+          </View>
+          <View style={styles.halfInput}>
+            <Text style={styles.bpLabel}>Prev. Weight</Text>
+            <TextInput style={styles.standardInput} value={prevWeight} onChangeText={(val) => onPrevWeightChange(val.replace(/[^0-9.]/g, '').slice(0, 5))}
+              keyboardType="decimal-pad"
+              placeholder="kg" placeholderTextColor={Colors.text.muted} />
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.bpCard}>
         <Text style={styles.bpLabel}>Systolic (mmHg)</Text>
         <TextInput
           style={[styles.bpInput, isCritical && { borderColor: Colors.risk.high }]}
           value={bpSys}
-          onChangeText={onSysChange}
+          onChangeText={(val) => onSysChange(val.replace(/\D/g, '').slice(0, 3))}
           keyboardType="number-pad"
           maxLength={3}
           placeholder="120"
@@ -186,7 +375,7 @@ function BPStep({ bpSys, bpDia, onSysChange, onDiaChange }: {
         <TextInput
           style={[styles.bpInput, isCritical && { borderColor: Colors.risk.high }]}
           value={bpDia}
-          onChangeText={onDiaChange}
+          onChangeText={(val) => onDiaChange(val.replace(/\D/g, '').slice(0, 3))}
           keyboardType="number-pad"
           maxLength={3}
           placeholder="80"
@@ -301,7 +490,7 @@ function FHRStep({ fhr, onFhrChange }: { fhr: string; onFhrChange: (v: string) =
         <TextInput
           style={[styles.fhrInput, isAbnormal && { borderColor: Colors.risk.high }]}
           value={fhr}
-          onChangeText={onFhrChange}
+          onChangeText={(val) => onFhrChange(val.replace(/\D/g, '').slice(0, 3))}
           keyboardType="number-pad"
           maxLength={3}
           placeholder="140"
@@ -330,10 +519,10 @@ function ReviewStep({ bpSys, bpDia, symptoms, muac, fhr, getMuacColor }: any) {
     <View style={styles.stepContent}>
       <View style={styles.reviewCard}>
         <Text style={styles.reviewTitle}>Assessment Summary</Text>
-        <ReviewRow label="Blood Pressure" value={bpSys && bpDia ? `${bpSys}/${bpDia} mmHg` : 'Not recorded'} highlight={parseInt(bpSys) >= 140} />
+        <ReviewRow label="Blood Pressure" value={bpSys && bpDia ? `${bpSys}/${bpDia} mmHg` : 'Not recorded'} highlight={(parseInt(bpSys) || 0) >= 140} />
         <ReviewRow label="Symptoms" value={symptoms.length > 0 ? `${symptoms.length} selected` : 'None'} highlight={symptoms.length > 3} />
         <ReviewRow label="MUAC" value={muac ? `${muac} cm` : 'Not recorded'} color={muac ? getMuacColor(muac) : undefined} />
-        <ReviewRow label="Fetal Heart Rate" value={fhr ? `${fhr} BPM` : 'Not recorded'} highlight={parseInt(fhr) < 110 || parseInt(fhr) > 160} />
+        <ReviewRow label="Fetal Heart Rate" value={fhr ? `${fhr} BPM` : 'Not recorded'} highlight={fhr && (parseInt(fhr) < 110 || parseInt(fhr) > 160)} />
       </View>
       <View style={styles.offlineSavedNote}>
         <Text style={styles.offlineSavedText}>Saved locally (offline-ready) ✓</Text>
@@ -382,6 +571,26 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: 160,
     height: 80,
+  },
+  standardInput: {
+    borderWidth: 1,
+    borderColor: Colors.border.medium,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: FontSize.md,
+    color: Colors.text.primary,
+    width: '100%',
+    marginBottom: 6,
+    backgroundColor: Colors.background,
+  },
+  rowInputs: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  halfInput: {
+    flex: 1,
   },
   bpDivider: { fontSize: FontSize.xxxl, color: Colors.text.muted, fontWeight: FontWeight.bold },
   alertBox: {
