@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Sunita",
+    "bp": [150, 100],
+    "symptoms": ["swelling"],
+    "muac": 20,
+    "fetal_hr": 120
+  },
+  {
+    "name": "Meera",
+    "bp": [130, 85],
+    "symptoms": ["bleeding"],
+    "muac": 22,
+    "fetal_hr": 100
+  }
+]

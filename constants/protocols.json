@@ -1,0 +1,16 @@
+{
+  "bp_high": {
+    "systolic": 140,
+    "diastolic": 90,
+    "reason": "High blood pressure (risk of preeclampsia)"
+  },
+  "muac_low": {
+    "threshold": 21,
+    "reason": "Low nutrition (MUAC < 21)"
+  },
+  "fetal_hr": {
+    "low": 110,
+    "high": 160,
+    "reason": "Abnormal fetal heart rate"
+  }
+}
